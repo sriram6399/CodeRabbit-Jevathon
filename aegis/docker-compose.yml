@@ -1,0 +1,43 @@
+name: aegis
+
+services:
+  loan-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aegis-loan-agent:latest
+    container_name: aegis-loan-agent
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    # Values come from the shell or from ./.env (copy .env.example to .env).
+    # Every key is optional; a missing key records a skipped status instead of failing.
+    environment:
+      AEGIS_DB_PATH: /app/data/aegis.db
+      TYPESAFE_API_KEY: ${TYPESAFE_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GMI_API_KEY: ${GMI_API_KEY:-}
+      GMI_MODEL: ${GMI_MODEL:-meta-llama/Llama-3.3-70B-Instruct}
+      PHOTON_PROJECT_ID: ${PHOTON_PROJECT_ID:-}
+      PHOTON_PROJECT_SECRET: ${PHOTON_PROJECT_SECRET:-}
+      BROWSERBASE_API_KEY: ${BROWSERBASE_API_KEY:-}
+      BROWSERBASE_PROJECT_ID: ${BROWSERBASE_PROJECT_ID:-}
+      CODERABBIT_API_KEY: ${CODERABBIT_API_KEY:-}
+      CODERABBIT_REGION: ${CODERABBIT_REGION:-}
+      WHOP_API_KEY: ${WHOP_API_KEY:-}
+      WHOP_ACCOUNT_ID: ${WHOP_ACCOUNT_ID:-}
+      WHOP_PRODUCT_ID: ${WHOP_PRODUCT_ID:-}
+      DEVIN_API_KEY: ${DEVIN_API_KEY:-}
+      DEVIN_ORG_ID: ${DEVIN_ORG_ID:-}
+    volumes:
+      - aegis-data:/app/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+volumes:
+  aegis-data:
+    name: aegis-data

@@ -1,0 +1,222 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  height: 100%;
+  scrollbar-gutter: stable;
+}
+
+body {
+  min-height: 100%;
+  background: #08090d;
+  color: #e6e9f2;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Aurora backdrop: generated image, dimmed, pinned behind everything */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image: url("/aegis-aurora.png");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* Fine grid + vignette on top of the aurora */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    radial-gradient(1200px 600px at 50% 0%, transparent 40%, rgba(8, 9, 13, 0.85) 100%);
+  background-size: 32px 32px, 32px 32px, 100% 100%;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.6) 60%, rgba(0, 0, 0, 0.9));
+}
+
+::selection {
+  background: rgba(139, 156, 255, 0.35);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2a2e40 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #2a2e40;
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+textarea {
+  resize: none;
+}
+
+pre code {
+  font-variant-ligatures: none;
+}
+
+/* AEGIS wordmark: animated gradient sheen */
+.wordmark {
+  background: linear-gradient(
+    100deg,
+    #e6e9f2 0%,
+    #8b9cff 30%,
+    #4ade9c 50%,
+    #8b9cff 70%,
+    #e6e9f2 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen 6s linear infinite;
+}
+
+@keyframes sheen {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 250% 50%;
+  }
+}
+
+/* Rotating conic ring behind the hero mark */
+.halo {
+  position: relative;
+  isolation: isolate;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* A large circle rotates invariantly; the container clips it to its rounded square */
+.halo::before {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  border-radius: 9999px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(139, 156, 255, 0) 0deg,
+    rgba(139, 156, 255, 0.9) 90deg,
+    rgba(74, 222, 156, 0.9) 180deg,
+    rgba(139, 156, 255, 0) 270deg,
+    rgba(139, 156, 255, 0) 360deg
+  );
+  animation: spin 5s linear infinite;
+  z-index: -1;
+}
+
+.halo::after {
+  content: "";
+  position: absolute;
+  inset: 1.5px;
+  border-radius: calc(1rem - 1.5px);
+  background: #0e1016;
+  z-index: -1;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Soft floating orbs */
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(60px);
+  opacity: 0.55;
+  pointer-events: none;
+  animation: drift 14s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(40px, -30px, 0) scale(1.15);
+  }
+}
+
+/* Scanning beam shown while a turn is being judged */
+.scan {
+  position: relative;
+  overflow: hidden;
+}
+
+.scan::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(139, 156, 255, 0.12) 45%,
+    rgba(74, 222, 156, 0.18) 50%,
+    rgba(139, 156, 255, 0.12) 55%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: scan 1.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes scan {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Gradient hairline border for premium panels */
+.edge {
+  position: relative;
+}
+
+.edge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(139, 156, 255, 0.45), rgba(255, 255, 255, 0.04) 40%, rgba(74, 222, 156, 0.35));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmark,
+  .halo::before,
+  .orb,
+  .scan::after {
+    animation: none;
+  }
+}
