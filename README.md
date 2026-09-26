@@ -1,38 +1,50 @@
-# Verdict
+# Aegis
 
-A ship / hold / block gate for pull requests, built for **JEVATHON** (TypeSafe × The AI Collective, hosted at CodeRabbit).
+Runtime governance for AI agents. Built for **JEVATHON** (TypeSafe × The AI Collective).
 
-Jev is not a chatbot. You send program state and typed questions; it returns calibrated probabilities in one parallel call. Verdict uses that as a merge gate:
+The app lives in [`aegis/`](aegis/). Full notes are in [`aegis/README.md`](aegis/README.md).
 
-- **SHIP** when Jev is confident the change can land
-- **HOLD** when uncertainty is high — route to a human
-- **BLOCK** on secrets, security, or critical production risk
+## Docker
 
-Then it confidence-gates the next action: auto-merge, ask an agent (Devin) to fix, or escalate.
-
-## Run it
+From `aegis/`:
 
 ```bash
+cd aegis
+cp .env.example .env
+docker compose up --build
+```
+
+On PowerShell:
+
+```powershell
+cd aegis
+Copy-Item .env.example .env
+docker compose up --build
+```
+
+Open [http://localhost:3001](http://localhost:3001).
+
+`.env` is optional. Every key can be empty; the demo still runs, and a missing `TYPESAFE_API_KEY` uses the mock judge. Stop a local `npm run dev` first if it is already bound to port 3001.
+
+```bash
+docker compose ps
+docker compose logs -f
+docker compose restart
+docker compose down
+docker compose down -v
+```
+
+`docker compose down` keeps the `aegis-data` ledger volume. `docker compose down -v` deletes it.
+
+The image is `aegis-loan-agent:latest`. The service is `loan-agent`. `GET /api/health` is the container health check.
+
+## Local dev
+
+```bash
+cd aegis
 npm install
 cp .env.example .env.local
-# paste TYPESAFE_API_KEY from console.typesafe.ai
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
-
-No key? The UI still works in **mock mode** so you can rehearse the demo.
-
-## Demo script (3 minutes)
-
-1. Paste the **Tiny copy fix** diff → expect **SHIP**.
-2. Paste the **Leaky token** diff → expect **BLOCK**.
-3. Load a real GitHub PR → show the 12-question board and latency.
-4. Point at the routing cards: auto-merge / Devin / human. That is the TypeSafe pattern.
-
-## HackerSquad submission
-
-- **Name:** Verdict
-- **One-liner:** Jev decides if a PR ships — in ~200ms, with probabilities your code can trust.
-- **Tools:** TypeSafe Jev (core), GitHub API, CodeRabbit review signals when present, Cognition/Devin as the auto-fix path.
-- After you ship: register the project, request a demo, and leave tool feedback for points.
+Open [http://localhost:3001](http://localhost:3001). Next reads `.env.local`. Compose reads `.env`.
