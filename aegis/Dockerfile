@@ -15,8 +15,11 @@ RUN npm ci
 
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# `next start` loads next.config.ts and resolves the typescript package to do it.
+# Prune drops that devDependency, so put it back before the runtime copy.
 RUN npm run build \
-  && npm prune --omit=dev
+  && npm prune --omit=dev \
+  && npm install --no-save --omit=dev typescript@5.9.2
 
 # ---- run: only what `next start` needs, as the unprivileged node user ----
 FROM node:22-bookworm-slim AS run
@@ -33,6 +36,7 @@ COPY --from=build --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/.next ./.next
 COPY --from=build --chown=node:node /app/public ./public
 COPY --from=build --chown=node:node /app/next.config.ts ./next.config.ts
+COPY --from=build --chown=node:node /app/tsconfig.json ./tsconfig.json
 
 RUN mkdir -p /app/data && chown node:node /app/data
 VOLUME ["/app/data"]

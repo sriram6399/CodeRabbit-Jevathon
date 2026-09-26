@@ -18,7 +18,7 @@ All notable changes to Aegis. Dates are the hackathon day. Newer entries belong 
 - Platform view: CodeRabbit review, Cognition Devin handoff (`wrap` or `review`), and GMI loan-agent cost plus a local Docker compose deploy. Each control stays available without credentials.
 - About (`#about`) and Subscribe (`#subscribe`). Whop plans are Wrap $29, Team $99, and Firm $249 per month. A missing Whop key stores a pending seat and does not lock the playground.
 - `AGENTS.md` for the next model.
-- Container build: two-stage `Dockerfile` (build, prune dev deps, run as `node`), `docker-compose.yml` with the `aegis-data` volume and a health check, `.dockerignore`, and `GET /api/health`. Verified with `npm run build` and `next start` on this machine; Docker itself was not available here.
+- Container build: two-stage `Dockerfile` (build, prune dev deps, run as `node`), `docker-compose.yml` with the `aegis-data` volume and a health check, `.dockerignore`, and `GET /api/health`. Verified with `docker compose up --build` on Docker Desktop 29: the container reports healthy as user `node`, all presets decide the same way as dev, the ledger stays intact across `docker compose restart` through the `aegis-data` volume. Image is 1.34 GB.
 
 ### Changed
 
@@ -28,5 +28,6 @@ All notable changes to Aegis. Dates are the hackathon day. Newer entries belong 
 
 ### Fixed
 
+- The container keeps TypeScript after dev dependencies are pruned, so `next start` can load `next.config.ts`, and it listens on `0.0.0.0` so the health check can reach it.
 - SQLite migrations run on every `getDb()` so a cached connection still picks up new columns.
 - Next workspace root is pinned to `aegis/` so the parent lockfile is not treated as the app root.
